@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>如何成为一个好女友 💗</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{margin:0;min-height:100%}
+body{background:linear-gradient(#ffe3ec,#ffbcd3);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;color:#7a2146;display:flex;flex-direction:column;align-items:center;padding:env(safe-area-inset-top) 12px env(safe-area-inset-bottom);overflow-x:hidden}
+h1{font-size:21px;margin:16px 0 2px;letter-spacing:1px}
+#sub{font-size:15px;margin:0 0 8px;opacity:.85}
+#board{position:relative;width:300px;height:340px;margin:6px 0}
+.t{position:absolute;width:44px;height:44px;border-radius:10px;background:#fff;border:2px solid #ff8fb1;box-shadow:0 3px 0 #e0608a;font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s}
+.t.dim{filter:brightness(.6);cursor:default}
+.t:not(.dim):active{transform:scale(.88)}
+#tray{display:flex;gap:4px;padding:6px;background:#ffffffaa;border-radius:12px;border:2px dashed #ff8fb1;margin-top:6px}
+.s{width:40px;height:44px;border-radius:8px;background:#ffffffaa;display:flex;align-items:center;justify-content:center;font-size:24px}
+#btns{display:flex;gap:10px;margin:14px 0}
+button{font:inherit;border:0;border-radius:20px;padding:10px 18px;background:#ff6f9f;color:#fff;font-weight:600;box-shadow:0 3px 0 #d94a7e}
+button.g{background:#fff;color:#d94a7e;box-shadow:0 3px 0 #ffb3cc}
+#toast{position:fixed;top:16%;left:50%;transform:translateX(-50%) scale(.85);background:#fff;padding:12px 18px;border-radius:16px;box-shadow:0 6px 20px #d94a7e55;opacity:0;transition:.25s;pointer-events:none;max-width:84vw;text-align:center;z-index:5;line-height:1.6}
+#toast.on{opacity:1;transform:translateX(-50%) scale(1)}
+#ov{position:fixed;inset:0;background:#7a214688;display:none;align-items:center;justify-content:center;z-index:9}
+#ov.on{display:flex}
+#card{background:#fff;border-radius:22px;padding:26px 22px;width:84vw;max-width:340px;text-align:center;line-height:1.7}
+#card .big{font-size:56px}
+#card h2{margin:6px 0;font-size:20px}
+#card p{margin:8px 0 14px}
+#card button{margin:4px}
+#card{max-height:84vh;overflow:auto}
+@keyframes fall{to{transform:translateY(112vh) rotate(360deg)}}
+.rain{position:fixed;top:-40px;z-index:20;pointer-events:none;animation:fall linear forwards}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px) rotate(-3deg)}40%{transform:translateX(10px) rotate(3deg)}60%{transform:translateX(-8px)}80%{transform:translateX(8px)}}
+.shake{animation:shake .5s}
+@keyframes boing{0%,100%{transform:scale(1)}50%{transform:scale(1.25) rotate(-8deg)}}
+.boing{display:inline-block;animation:boing .8s infinite}
+.cp{background:#fff0f5;border:2px dashed #ff8fb1;border-radius:12px;padding:8px 10px;margin:6px 0;text-align:left}
+.letter{text-align:left;background:#fff7fa;border-radius:12px;padding:12px;font-size:15px}
+</style>
+</head>
+<body>
+<h1>如何成为一个好女友 💗</h1>
+<div id="sub"></div>
+<div id="board"></div>
+<div id="tray"></div>
+<div id="btns"><button class="g" onclick="undo()">↩︎ 撤回</button><button class="g" onclick="reshuffle()">🔀 洗牌</button></div>
+<div id="toast"></div>
+<div id="ov"><div id="card"></div></div>
+<script>
+const CONFIG={her:"粉色小猪的妈妈",him:"wcy"};
+const QUOTES=[
+"今天也很喜欢你,比昨天多一点点。",
+"你笑起来的时候,我的世界会自动变甜。",
+"想和你把平淡的日子,过成喜欢的样子。",
+"遇见你,是我最好的运气。",
+"我的手机里全是你,我的心里也是。",
+"全世界最软的地方,都留给了你。",
+"你不用很完美,你是你就刚刚好。",
+"以后的每个明天,我都想和你一起度过。"
+];
+const LETTER=`亲爱的${CONFIG.her}:<br>谢谢你一路闯关,也谢谢你愿意大声说出那句话。这个小游戏是我偷偷做给你的,里面的每一句情话都是真心的。(把这里换成你最想对她说的话)<br><br>—— 永远爱你的我`;
+const COUPONS=["免费拥抱券 × 1,随时可用","大餐请客券 × 1","无理取闹豁免券 × 1","陪你看电影券 × 1"];
+const LEVELS=[
+ {t:"第1关:记住他的小习惯",types:4,sets:2,layers:2,
+  reward:"🍓 第一关通过!能记住他的小习惯,说明你很用心,他会很感动的。"},
+ {t:"第2关:好好听他说话",types:5,sets:2,layers:2,
+  reward:"🧸 第二关通过!认真听他说话的你,是他一天里最想见到的人。"},
+ {t:"第3关:给他一个拥抱",types:6,sets:2,layers:3,
+  reward:"🤗 第三关通过!你的拥抱,是他一天里最治愈的事。"},
+ {t:"第4关:撒娇是女友的必修课",types:7,sets:2,layers:3,
+  reward:"🎀 第四关通过!会撒娇的你,可爱到犯规啦~"},
+ {t:"第5关:牵着手,慢慢走下去",types:8,sets:2,layers:4,
+  reward:"🌹 全部通关!你已经是满分女友啦,只差最后的终极任务,通关后有惊喜在等你 🎁"}
+];
+const SILLY=["哎呀,手速不错嘛~","嘿嘿,被你发现啦~","小心变成粉色小笨猪哦 🐷","这一步,他看了都想亲你~","加油!他在终点等你呢~"];
+const EMOJI=["🍓","🧸","🌹","💌","🎀","🍰","🐰","🍭"];
+// ============================================
+let lv=0,tiles=[],tray=[],qi=0,tt;
+const $=id=>document.getElementById(id);
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+function ov(em,ti,tx,bs){
+  const c=$("card");
+  c.innerHTML=`<div class="big">${em}</div><h2>${ti}</h2><p>${tx}</p>`;
+  bs.forEach(([l,f,k])=>{const b=document.createElement("button");b.textContent=l;if(k)b.className=k;b.onclick=()=>{$("ov").classList.remove("on");f()};c.appendChild(b)});
+  $("ov").classList.add("on");
+}
+function toast(s){const t=$("toast");t.textContent="💗 "+s;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),2200)}
+
+function start(n){
+  lv=n;tray=[];tiles=[];
+  const L=LEVELS[n],pool=[],used=new Set();
+  EMOJI.slice(0,L.types).forEach(e=>{for(let i=0;i<L.sets*3;i++)pool.push(e)});
+  shuffle(pool).forEach(e=>{
+    let x,y,l,k;
+    do{l=Math.floor(Math.random()*L.layers);const o=(l%2)*22;
+      x=Math.floor(Math.random()*6)*44+o;y=Math.floor(Math.random()*7)*44+o;k=l+","+x+","+y}while(used.has(k));
+    used.add(k);tiles.push({e,x,y,l,on:true});
+  });
+  render();
+}
+function covered(t){return tiles.some(u=>u.on&&u.l>t.l&&Math.abs(u.x-t.x)<44&&Math.abs(u.y-t.y)<44)}
+function render(){
+  $("sub").textContent=LEVELS[lv].t;
+  const b=$("board");b.innerHTML="";
+  tiles.forEach(t=>{
+    if(!t.on)return;
+    const d=document.createElement("div"),c=covered(t);
+    d.className="t"+(c?" dim":"");
+    d.style.cssText=`left:${t.x}px;top:${t.y}px;z-index:${t.l}`;
+    d.textContent=t.e;
+    if(!c)d.onclick=()=>pick(t);
+    b.appendChild(d);
+  });
+  const tr=$("tray");tr.innerHTML="";
+  for(let i=0;i<7;i++){const s=document.createElement("div");s.className="s";s.textContent=tray[i]?tray[i].e:"";tr.appendChild(s)}
+}
+function pick(t){
+  if(tray.length>=7)return;
+  t.on=false;
+  const i=tray.map(x=>x.e).lastIndexOf(t.e);
+  if(i<0)tray.push(t);else tray.splice(i+1,0,t);
+  if(tray.filter(x=>x.e===t.e).length>=3){
+    tray=tray.filter(x=>x.e!==t.e);
+    toast(QUOTES[qi++%QUOTES.length]);rain("💗",8);
+  }else if(Math.random()<.12)toast(SILLY[Math.floor(Math.random()*SILLY.length)]);
+  render();
+  if(tiles.every(x=>!x.on)&&!tray.length){rain("🎀",14);setTimeout(win,900)}
+  else if(tray.length>=7){shakeIt($("tray"));setTimeout(()=>ov("🙈","槽满啦,小笨蛋~","没关系,再来一次,你一定可以的!",[["重来本关",()=>start(lv)]]),500)}
+}
+function rain(e,n){for(let i=0;i<n;i++){const d=document.createElement("div");d.className="rain";d.textContent=e;d.style.left=Math.random()*95+"vw";d.style.fontSize=(18+Math.random()*22)+"px";d.style.animationDuration=(2+Math.random()*2.5)+"s";d.style.animationDelay=Math.random()*1.2+"s";document.body.appendChild(d);setTimeout(()=>d.remove(),6500)}}
+function shakeIt(el){el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake")}
+function undo(){if(!tray.length)return;const t=tray.pop();t.on=true;render()}
+function reshuffle(){const on=tiles.filter(t=>t.on),es=shuffle(on.map(t=>t.e));on.forEach((t,i)=>t.e=es[i]);render()}
+
+function win(){
+  const L=LEVELS[lv];
+  if(lv<LEVELS.length-1)ov("🎁","过关啦!",L.reward,[["下一关",()=>start(lv+1)]]);
+  else ov("💝","终极任务",L.reward+`<br><br>现在,走到${CONFIG.him}身边,大声对他说一句:<b>“我爱你”</b>`,[["🎤 我要说",listen],["我不说",pig,"g"]]);
+}
+function listen(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return honor("这个浏览器不能识别语音,那就靠自觉啦。");
+  const r=new SR();let got=false;
+  r.lang="zh-CN";
+  r.onresult=e=>{
+    got=true;
+    const s=e.results[0][0].transcript;
+    if(/我爱你|爱你/.test(s))love();
+    else ov("🤔",`听到的是“${s}”`,"不是“我爱你”哦,再说一次?",[["再说一次",listen],["我不说",pig,"g"]]);
+  };
+  r.onerror=()=>{got=true;honor("麦克风好像不能用,那就靠自觉啦。")};
+  r.onend=()=>{if(!got)ov("🙉","没听清","请靠近一点,大声说:我爱你",[["再说一次",listen],["我不说",pig,"g"]])};
+  ov("🎤","在听呢…","请大声说:<b>我爱你</b>",[["取消",win,"g"]]);
+  try{r.start()}catch(e){honor("麦克风好像不能用,那就靠自觉啦。")}
+}
+function honor(m){ov("🤝","凭良心回答",m+`<br>你真的亲口对${CONFIG.him}说了“我爱你”吗?`,[["说啦!",love],["没说",pig,"g"]])}
+function love(){
+  rain("💗",32);rain("🎉",10);
+  ov("🥰","惊喜解锁!",`${CONFIG.him}一定听到啦~<div class="letter">${LETTER}</div><p>🎁 你的专属优惠券:</p>${COUPONS.map(c=>`<div class="cp">🎟️ ${c}</div>`).join("")}`,[["再玩一次",()=>start(0)]]);
+}
+function pig(){
+  rain("🐷",28);
+  ov(`<span class="boing">🐷</span>`,"粉色小笨猪!",`没有对${CONFIG.him}说“我爱你”,${CONFIG.her}就是粉色小笨猪!哼哼哼~ 🐽<br><br>🔒 最后的惊喜被锁住啦,大声说出来才能打开哦~`,[["我要重新挑战",win]]);
+  shakeIt($("card"));
+}
+
+ov("💗","如何成为一个好女友",`${CONFIG.her},准备好接受挑战了吗?<br>消除三个相同的图案,闯过5关,每次消除都有情话,最后还藏着一个惊喜哦~ 🎁`,[["开始挑战",()=>start(0)]]);
+</script>
+</body>
+</html>
